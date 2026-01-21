@@ -53,6 +53,27 @@
         .disconnected {
             color: #f00;
         }
+
+        /* Log color classes */
+        .log-success {
+            color: #0f0;
+        }
+
+        .log-error {
+            color: #f00;
+        }
+
+        .log-warning {
+            color: #ff9800;
+        }
+
+        .log-info {
+            color: #888;
+        }
+
+        .log-reconnect {
+            color: #888;
+        }
     </style>
 </head>
 
@@ -84,10 +105,18 @@
         resize();
         window.addEventListener("resize", resize);
 
-        // Logging function with timestamp
-        function log(msg) {
+        // Logging function with timestamp and color
+        function log(msg, colorClass = '') {
             const time = new Date().toLocaleTimeString();
-            logBox.innerHTML += `<br>[${time}] ${msg}`;
+            const colorAttr = colorClass ? ` class="${colorClass}"` : '';
+            logBox.innerHTML += `<br><span${colorAttr}>[${time}] ${msg}</span>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // Logging function with custom color (for user-specific messages)
+        function logWithColor(msg, color) {
+            const time = new Date().toLocaleTimeString();
+            logBox.innerHTML += `<br><span style="color: ${color}">[${time}] ${msg}</span>`;
             logBox.scrollTop = logBox.scrollHeight;
         }
 
@@ -115,7 +144,7 @@
             socket = new WebSocket(wsUrl);
 
             socket.onopen = () => {
-                log("✓ Connected to server");
+                log("Connected to server", "log-success");
                 statusEl.textContent = "Connected";
                 statusEl.className = "connected";
                 clearInterval(reconnectInterval);
@@ -131,32 +160,34 @@
                         touches: data.touches,
                         color: data.color
                     });
-                    log(`👆 Update from user ${data.clientId.substr(0, 4)}: ${data.touches.length} touch(es)`);
+                    logWithColor(`Update from user ${data.clientId.substr(0, 4)}: ${data.touches.length} touch(es)`, data.color);
                     updateUserCount();
                 }
 
                 // Another user cleared all their touches
                 if (data.type === "clearTouches") {
+                    const clientData = remoteTouches.get(data.clientId);
+                    const userColor = clientData ? clientData.color : '#888';
                     remoteTouches.delete(data.clientId);
-                    log(`👋 User ${data.clientId.substr(0, 4)} cleared touches`);
+                    logWithColor(`User ${data.clientId.substr(0, 4)} cleared touches`, userColor);
                     updateUserCount();
                 }
             };
 
             socket.onclose = () => {
-                log("✗ Disconnected from server");
+                log("Disconnected from server", "log-error");
                 statusEl.textContent = "Disconnected";
                 statusEl.className = "disconnected";
 
                 // Attempt to reconnect every 3 seconds
                 reconnectInterval = setInterval(() => {
-                    log("⟳ Attempting to reconnect...");
+                    log("Attempting to reconnect...", "log-reconnect");
                     connect();
                 }, 3000);
             };
 
             socket.onerror = error => {
-                log("✗ WebSocket error");
+                log("WebSocket error", "log-error");
                 console.error('WebSocket error:', error);
             };
         }
@@ -211,7 +242,7 @@
         canvas.addEventListener("touchstart", e => {
             for (let t of e.changedTouches) {
                 updateLocalTouch(t);
-                log(`👇 Touch start: ID ${t.identifier} at (${Math.round(t.clientX)}, ${Math.round(t.clientY)})`);
+                logWithColor(`Touch start: ID ${t.identifier} at (${Math.round(t.clientX)}, ${Math.round(t.clientY)})`, myColor);
             }
             sendTouchState();
             updateUserCount();
@@ -231,7 +262,7 @@
         canvas.addEventListener("touchend", e => {
             for (let t of e.changedTouches) {
                 localTouches.delete(t.identifier);
-                log(`👆 Touch end: ID ${t.identifier}`);
+                logWithColor(`Touch end: ID ${t.identifier}`, myColor);
             }
             sendTouchState();
             if (localTouches.size === 0) {
@@ -245,7 +276,7 @@
         canvas.addEventListener("touchcancel", e => {
             for (let t of e.changedTouches) {
                 localTouches.delete(t.identifier);
-                log(`⚠ Touch cancel: ID ${t.identifier}`);
+                logWithColor(`Touch cancel: ID ${t.identifier}`, myColor);
             }
             sendTouchState();
             if (localTouches.size === 0) {
@@ -271,7 +302,7 @@
             });
             sendTouchState();
             updateUserCount();
-            log(`🖱 Mouse down at (${Math.round(e.clientX)}, ${Math.round(e.clientY)})`);
+            logWithColor(`Mouse down at (${Math.round(e.clientX)}, ${Math.round(e.clientY)})`, myColor);
         });
 
         canvas.addEventListener("mousemove", e => {
@@ -295,7 +326,7 @@
                     clearTouchState();
                 }
                 updateUserCount();
-                log(`🖱 Mouse up`);
+                logWithColor(`Mouse up`, myColor);
             }
         });
 
@@ -352,7 +383,7 @@
         // Start the drawing loop
         draw();
 
-        log(`✓ Client initialized with ID: ${clientId}`);
+        logWithColor(`Client initialized with ID: ${clientId}`, myColor);
     </script>
 </body>
 
