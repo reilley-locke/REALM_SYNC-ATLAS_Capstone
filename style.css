@@ -1,0 +1,116 @@
+/* ══════════════════════════════════
+          CSS REMINDERS/NOTES
+   ══════════════════════════════════ 
+   I have not coded in CSS in a while. So:
+   --> # is for ID Selector (unique, individual elements)
+   --> . is for Class Selector (used to style multiple elements)
+   */
+
+
+
+/* ══════════════════════════════════
+           GENERAL PAGE STYLES
+   ══════════════════════════════════ */
+body 
+{
+    margin: 0;
+    overflow: hidden; /* Acts sort of like a mask; any excess content is hidden from view/cut out */
+    background: #111;
+    touch-action: none; /* Prevent default touch behaviors like scrolling and zooming, which is common with multiple fingers touching the screen (would be really annoying lol) */
+}
+
+
+
+/* ══════════════════════════════════
+             CANVAS STYLES
+   ══════════════════════════════════ */
+#canvas 
+{
+    display: block;
+    cursor: crosshair;
+}
+
+
+
+/* ══════════════════════════════════
+            LOG PANEL STYLES
+   ══════════════════════════════════ */
+#log 
+{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0f0;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    border-top: 2px solid #0f0;
+}
+
+
+
+/* ══════════════════════════════════
+          STATUS PANEL STYLES
+   ══════════════════════════════════ */
+#status 
+{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+
+
+/* ══════════════════════════════════
+        CONNECTION STATUS COLORS
+   ══════════════════════════════════ */
+.connected 
+{
+    color: #0f0;
+    /* Green for connected */
+}
+
+.disconnected 
+{
+    color: #f00;
+    /* Red for disconnected */
+}
+
+
+
+/* ══════════════════════════════════
+    LOG MESSAGE COLOR CLASSES
+   ══════════════════════════════════ */
+/* Green for successful events */
+.log-success 
+{
+    color: #0f0;
+}
+
+/* Red for errors and disconnections */
+.log-error 
+{
+    color: #f00;
+}
+
+/* Orange for warnings */
+.log-warning 
+{
+    color: #ff9800;
+}
+
+/* Grey for informational messages and reconnection attempts */
+.log-info, .log-reconnect
+{
+    color: #888;
+}
